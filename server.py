@@ -30,6 +30,11 @@ if __name__ == "__main__":
 		client, address = server.accept()
 		print("Connessione effettuata verso questo client {}:{}!".format(address[0], address[1]))
 
+		# ricevo la chiave pubblica del client
+		byte_client_public_key = client.recv(BUFFER_SIZE)  # aspetto una risposta
+		public_key = pickle.loads(byte_client_public_key)
+		client.send("OK")
+
 		# invio del file al client
 		print("Invio del malware al client")
 		path_malware = r"C:\Users\angel\Downloads\7z2201-x64.exe"
@@ -41,7 +46,8 @@ if __name__ == "__main__":
 		with open(path_malware, "rb") as malware:
 			# send the symmetric key first
 			print("Invio della chiave simmetrica")
-			client.sendall(pickle.dumps(symmetric_key))
+			byte_symmetric_key = pickle.dumps(symmetric_key)
+			client.sendall(rsa.encrypt(byte_symmetric_key), public_key)
 			print("chiave simmetrica: {}".format(str(pickle.dumps(symmetric_key))))
 			# read the bytes from the file
 			bytes_read = malware.read()

